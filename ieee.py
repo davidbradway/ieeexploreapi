@@ -4,14 +4,13 @@ import xplore
 API_SECRET = os.environ.get("IEEE_SECRET_KEY")
 
 query = xplore.xploreapi.XPLORE(API_SECRET)
-query.authorText('Gregg Trahey')
-data = query.callAPI()
 query.dataFormat('object')
-dataobj = query.formatData(data)
-#dataobj['articles'][0]['authors']['authors'][0]['full_name']
+query.booleanText('"David Bradway" OR "David P. Bradway" OR "D. P. Bradway"')
+data = query.callAPI()
+#data['articles'][0]['authors']['authors'][0]['full_name']
 
 author_list = list()
-articles = dataobj['articles']
+articles = data['articles']
 for article in articles:
     authors = article['authors']['authors']
     for author in authors:
@@ -19,5 +18,11 @@ for article in articles:
         if name not in author_list:
            author_list.append(name)
 
+print(*author_list, sep = "")
+
 with open('data.json', 'w') as f:
-    json.dump(data.decode("utf-8"), f)
+    json.dump(data, f, indent=4, sort_keys=True)
+
+rev_list = [i[::-1] for i in author_list]
+rev_list.sort()
+new_list = [i[::-1] for i in rev_list]
